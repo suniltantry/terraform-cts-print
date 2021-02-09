@@ -7,6 +7,7 @@ terraform {
   }
 }
 
+# Create a file per Consul service with addresses written in each file
 resource "local_file" "consul_service" {
   for_each = local.consul_services
 
