@@ -11,8 +11,15 @@ terraform {
 resource "local_file" "consul_service" {
   for_each = local.consul_services
 
-  content  = join("\n", [for s in each.value : s.node_address])
+  content  = join("\n", [
+    for s in each.value :
+    var.include_meta == true ? format("%s\t%v", s.node_address, s.meta) : s.node_address
+  ])
   filename = "${each.key}.txt"
+}
+
+output "consul_services" {
+  value = local.consul_services
 }
 
 locals {
@@ -23,15 +30,6 @@ locals {
   })
 
   # Group service instances by service name
-  # consul_services = {
-  #   "app" = [
-  #     {
-  #       "id" = "app-id-01"
-  #       "name" = "app"
-  #       "node_address" = "192.168.10.10"
-  #     }
-  #   ]
-  # }
   consul_services = {
     for name, ids in local.consul_service_ids :
     name => [for id in ids : var.services[id]]
