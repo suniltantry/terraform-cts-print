@@ -36,8 +36,8 @@ example.hcl
 ```hcl
 task {
   name        = "example"
-  source      = "findkim/print/consul"
-  version     = "0.0.1"
+  source      = "findkim/print/cts"
+  version     = "0.1.0"
   services    = ["web", "api"]
 }
 ```
