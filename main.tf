@@ -11,7 +11,7 @@ terraform {
 resource "local_file" "consul_service" {
   for_each = local.consul_services
 
-  content  = join("\n", [
+  content = join("\n", [
     for s in each.value :
     var.include_meta == true ? format("%s\t%v", s.node_address, s.meta) : s.node_address
   ])
@@ -23,15 +23,8 @@ output "consul_services" {
 }
 
 locals {
-  # Create a map of service names to instance IDs to then build
-  # a map of service names to instances
-  consul_service_ids = transpose({
-    for id, s in var.services : id => [s.name]
-  })
-
   # Group service instances by service name
   consul_services = {
-    for name, ids in local.consul_service_ids :
-    name => [for id in ids : var.services[id]]
+    for id, s in var.services : s.name => s...
   }
 }
