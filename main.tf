@@ -11,7 +11,7 @@ terraform {
 resource "local_file" "consul_service" {
   for_each = local.service_details
   content = join("\n", [
-    for s in each.value ]
+    for s in each.value : s ]
   ])
   filename = "${each.key}.txt"
 }
