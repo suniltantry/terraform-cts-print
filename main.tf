@@ -8,27 +8,19 @@ terraform {
 }
 
 # Create a file per Consul service with addresses written in each file
-resource "local_file" "all_service_details" {
-  content = join("\n\n", [
-    for service in local.service_details : <<EOT
-Name: ${service.name}
-ID: ${service.id}
-Port: ${service.port}
-Address: ${service.address}
-Tags: ${join(", ", service.tags)}
-EOT
+resource "local_file" "consul_service" {
+  for_each = local.consul_services
+
+  content = join("\n", [
+    for s in each.value :
+    var.include_meta == true ? format("%s\t%v", s.node_address, s.meta) : s.node_address
   ])
-
-  filename = "${random_string.random_file_name.result}.txt"
+  filename = "${each.key}.txt"
 }
 
-# Generate a random file name
-resource "random_string" "random_file_name" {
-  length  = 8
-  special = false
-  upper   = false
+output "consul_services" {
+  value = local.consul_services
 }
-
 
 locals {
   # Group service instances by service name
@@ -44,4 +36,11 @@ locals {
       tags    = service.tags
     }
   ]
+}
+
+
+resource "local_file" "key-value-pairs" {
+  for_each = var.consul_kv
+  content  = each.value
+  filename = "resources/${each.key}.txt"
 }
