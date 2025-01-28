@@ -44,3 +44,8 @@ variable "include_meta" {
   type        = bool
   default     = false
 }
+
+variable "consul_kv" {
+  description = "Consul KV pair"
+  type        = map(string)
+}
